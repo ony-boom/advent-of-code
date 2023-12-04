@@ -1,6 +1,6 @@
 const decoder = new TextDecoder("utf-8");
 
-const inputPath = "./input.txt";
+const inputPath = "./2023/day-1/input.txt";
 
 const inputFile = await Deno.readFile(inputPath);
 
