@@ -6,7 +6,9 @@ const flags = parse(Deno.args, {
   alias: { years: "y", day: "d" },
 });
 
-flags.years ||= flags.y || "2023";
+const year = new Date().getFullYear();
+
+flags.years ||= flags.y || year.toString();
 flags.day ||= flags.d || "1";
 
 if (!flags.years || !flags.day) {
