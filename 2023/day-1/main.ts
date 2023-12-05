@@ -1,10 +1,4 @@
-const decoder = new TextDecoder("utf-8");
-
-const inputPath = "./2023/day-1/input.txt";
-
-const inputFile = await Deno.readFile(inputPath);
-
-const input = decoder.decode(inputFile);
+import { getInputLines } from "../../shared/utils.ts";
 
 const wordToNumberMap: Map<string, string> = new Map([
   ["one", "1"],
@@ -18,10 +12,10 @@ const wordToNumberMap: Map<string, string> = new Map([
   ["nine", "9"],
 ]);
 
-function sumCalibrationValues(input: string[]) {
+function sumCalibrationValues(lines: string[]) {
   let total = 0;
 
-  for (const line of input) {
+  for (const line of lines) {
     const matches = line.matchAll(
       /(?=(one|two|three|four|five|six|seven|eight|nine|\d))/g
     );
@@ -37,4 +31,6 @@ function sumCalibrationValues(input: string[]) {
   return total;
 }
 
-console.log(sumCalibrationValues(input.split("\n")));
+const lines = await getInputLines(2023, 1);
+
+console.log(sumCalibrationValues(lines));
