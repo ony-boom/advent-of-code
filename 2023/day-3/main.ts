@@ -23,6 +23,8 @@ const updateSum = () => {
   if (currentNum.line >= 0) {
     const start = currentNum.column.at(0)!;
     const end = currentNum.column.at(-1)!;
+
+    // TODO: finish this mess
     const startIndex = start.index - 1, endIndex = end.index + 1;
 
     let isEnginePart = false;
