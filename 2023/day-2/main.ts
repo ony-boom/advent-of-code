@@ -39,7 +39,7 @@ class Game {
     let isPossible = true;
 
     for (const key in this.grouped) {
-      const group = this.grouped[key as CubeColor];
+      const group = this.grouped[key as CubeColor]!;
       const maxCount = this.maxCountPerCubes[key as CubeColor];
       isPossible = isPossible && group.every((set) => set.count <= maxCount);
     }
@@ -72,7 +72,7 @@ class Game {
     };
 
     for (const key in this.grouped) {
-      const bag = this.grouped[key as CubeColor].map((set) => {
+      const bag = this.grouped[key as CubeColor]!.map((set) => {
         return set.count;
       });
 

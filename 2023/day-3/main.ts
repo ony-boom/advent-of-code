@@ -1,39 +1,62 @@
-import { isNumber } from "https://deno.land/x/is_number@v1.6.1/mod.ts";
-
 import { getInputLines } from "../../shared/utils.ts";
 
 const lines = await getInputLines(2023, 3);
 
-const linesToArray = lines.map((line) => {
-  return line
-    .match(/\.{1,}|[-%!@/\\^$&*()_+=|?><,;:]+|[0-9]+/g)
-    ?.flat()
-    .map((item) => {
-      if (!isNaN(Number(item))) {
-        return Number(item);
-      }
-      return item;
-    });
-});
+const symbolRe = /[!@#$%^&*()_+{}\[\]:;"'<>,.?/~`=|-]/;
 
-const partsNumber = linesToArray.filter((line) => {
-  if (!line) return false;
-  let isPart = false;
+let sum = 0;
+const DEFAULT: {
+  line: number;
+  column: { index: number; value: string }[];
+  upperLine: string;
+  downLine: string;
+} = {
+  line: -1,
+  column: [],
+  downLine: "",
+  upperLine: "",
+};
 
-  for (const [i, item] of Object.entries(line)) {
-    const index = Number(i);
+let currentNum = DEFAULT;
 
-    if (!isNumber(item)) continue;
+const updateSum = () => {
+  if (currentNum.line >= 0) {
+    const start = currentNum.column.at(0)!;
+    const end = currentNum.column.at(-1)!;
+    const startIndex = start.index - 1, endIndex = end.index + 1;
 
-    const rowAbove = line[index - 1];
-    const rowBellow = line[index + 1];
-
-    const { length } = String(item);
-
-    // const hasSymbolNextToIt = 
+    let isEnginePart = false;
   }
 
-  return isPart;
-});
+  currentNum = DEFAULT;
+};
 
-console.log(linesToArray);
+for (const [lineIndex, line] of lines.entries()) {
+  const splitedLine = line.split("");
+
+  for (const [columnIndex, char] of splitedLine.entries()) {
+    if (symbolRe.test(char)) {
+      updateSum();
+
+      continue;
+    }
+
+    if (char === ".") {
+      updateSum();
+      continue;
+    }
+
+    currentNum = {
+      ...currentNum,
+      line: lineIndex,
+      downLine: lines[lineIndex + 1],
+      upperLine: lines[lineIndex - 1],
+      column: [...currentNum.column, {
+        index: columnIndex,
+        value: char,
+      }],
+    };
+  }
+}
+
+console.log(sum);
