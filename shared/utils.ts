@@ -10,7 +10,7 @@ export const getInput = async (year: number, day: number): Promise<string> => {
 
 export const getInputLines = async (
   year: number,
-  day: number
+  day: number,
 ): Promise<string[]> => {
   const input = await getInput(year, day);
 

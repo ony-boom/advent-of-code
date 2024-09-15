@@ -2,7 +2,7 @@ import { getInputLines } from "../../shared/utils.ts";
 
 const lines = await getInputLines(2023, 3);
 
-const symbolRe = /[!@#$%^&*()_+{}\[\]:;"'<>,.?/~`=|-]/;
+const symbolRe = /[!@#$%^&*()_+{}\[\]:;"'<>,?/~`=|-]/;
 
 let sum = 0;
 const DEFAULT: {
@@ -10,27 +10,52 @@ const DEFAULT: {
   column: { index: number; value: string }[];
   upperLine: string;
   downLine: string;
+  currenrtLine: string;
 } = {
   line: -1,
   column: [],
   downLine: "",
   upperLine: "",
+  currenrtLine: "",
 };
 
 let currentNum = DEFAULT;
 
-const updateSum = () => {
+const isSymbol = (str: string) => symbolRe.test(str);
+
+const getEnginePart = () => {
+  let value = 0;
   if (currentNum.line >= 0) {
+    const columnValue = Number(
+      currentNum.column.map(({ value }) => value).join(""),
+    );
     const start = currentNum.column.at(0)!;
     const end = currentNum.column.at(-1)!;
 
-    // TODO: finish this mess
     const startIndex = start.index - 1, endIndex = end.index + 1;
 
-    let isEnginePart = false;
+    if (
+      isSymbol(currentNum.currenrtLine[startIndex]) ||
+      isSymbol(currentNum.currenrtLine[endIndex])
+    ) {
+      value = columnValue;
+      currentNum = DEFAULT;
+      return value;
+    }
+
+    for (let index = startIndex; index <= endIndex; index++) {
+      if (
+        isSymbol(currentNum.upperLine?.[index]) ||
+        isSymbol(currentNum.downLine?.[index])
+      ) {
+        value = columnValue;
+        break;
+      }
+    }
   }
 
   currentNum = DEFAULT;
+  return value;
 };
 
 for (const [lineIndex, line] of lines.entries()) {
@@ -38,13 +63,13 @@ for (const [lineIndex, line] of lines.entries()) {
 
   for (const [columnIndex, char] of splitedLine.entries()) {
     if (symbolRe.test(char)) {
-      updateSum();
+      sum += getEnginePart() || 0;
 
       continue;
     }
 
     if (char === ".") {
-      updateSum();
+      sum += getEnginePart() || 0;
       continue;
     }
 
@@ -53,6 +78,7 @@ for (const [lineIndex, line] of lines.entries()) {
       line: lineIndex,
       downLine: lines[lineIndex + 1],
       upperLine: lines[lineIndex - 1],
+      currenrtLine: lines[lineIndex],
       column: [...currentNum.column, {
         index: columnIndex,
         value: char,

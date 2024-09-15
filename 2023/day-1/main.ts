@@ -17,7 +17,7 @@ function sumCalibrationValues(lines: string[]) {
 
   for (const line of lines) {
     const matches = line.matchAll(
-      /(?=(one|two|three|four|five|six|seven|eight|nine|\d))/g
+      /(?=(one|two|three|four|five|six|seven|eight|nine|\d))/g,
     );
 
     const digits = Array.from(matches)

@@ -22,8 +22,8 @@ class Game {
   }
 
   get power() {
-    const { blue, green, red } =
-      this.#getEachColorMinimalCountToMakeGamePossible();
+    const { blue, green, red } = this
+      .#getEachColorMinimalCountToMakeGamePossible();
     return red * blue * green;
   }
 
@@ -77,7 +77,7 @@ class Game {
       });
 
       eachColorMinimalCountToMakeGamePossible[key as CubeColor] = Math.max(
-        ...bag
+        ...bag,
       );
     }
 
