@@ -4,87 +4,86 @@ const lines = await getInputLines(2023, 3);
 
 const symbolRe = /[!@#$%^&*()_+{}\[\]:;"'<>,?/~`=|-]/;
 
-let sum = 0;
-const DEFAULT: {
-  line: number;
-  column: { index: number; value: string }[];
-  upperLine: string;
-  downLine: string;
-  currenrtLine: string;
-} = {
-  line: -1,
-  column: [],
+const DEFAULT_LINE: Lines = {
+  index: -1,
+  columns: [],
   downLine: "",
   upperLine: "",
-  currenrtLine: "",
+  raw: "",
 };
 
-let currentNum = DEFAULT;
+const isEnginePartSymbol = (str: string) => symbolRe.test(str);
 
-const isSymbol = (str: string) => symbolRe.test(str);
-
-const getEnginePart = () => {
+const getEnginePartValue = (line: Lines) => {
   let value = 0;
-  if (currentNum.line >= 0) {
-    const columnValue = Number(
-      currentNum.column.map(({ value }) => value).join(""),
-    );
-    const start = currentNum.column.at(0)!;
-    const end = currentNum.column.at(-1)!;
+  if (line.index < 0) return value;
 
-    const startIndex = start.index - 1, endIndex = end.index + 1;
+  const partNumber = Number(
+    line.columns.map(({ value }) => value).join(""),
+  );
+  const start = line.columns.at(0)!;
+  const end = line.columns.at(-1)!;
 
-    if (
-      isSymbol(currentNum.currenrtLine[startIndex]) ||
-      isSymbol(currentNum.currenrtLine[endIndex])
-    ) {
-      value = columnValue;
-      currentNum = DEFAULT;
-      return value;
-    }
+  const startIndex = start.index - 1, endIndex = end.index + 1;
 
-    for (let index = startIndex; index <= endIndex; index++) {
-      if (
-        isSymbol(currentNum.upperLine?.[index]) ||
-        isSymbol(currentNum.downLine?.[index])
-      ) {
-        value = columnValue;
-        break;
-      }
-    }
+  if (
+    isEnginePartSymbol(line.raw[startIndex]) ||
+    isEnginePartSymbol(line.raw[endIndex])
+  ) {
+    return partNumber;
   }
 
-  currentNum = DEFAULT;
+  for (let index = startIndex; index <= endIndex; index++) {
+    if (
+      isEnginePartSymbol(line.upperLine?.[index]) ||
+      isEnginePartSymbol(line.downLine?.[index])
+    ) {
+      value = partNumber;
+      break;
+    }
+  }
   return value;
 };
+
+let sum = 0;
+let currentLine = DEFAULT_LINE;
 
 for (const [lineIndex, line] of lines.entries()) {
   const splitedLine = line.split("");
 
   for (const [columnIndex, char] of splitedLine.entries()) {
     if (symbolRe.test(char)) {
-      sum += getEnginePart() || 0;
-
+      sum += getEnginePartValue(currentLine);
+      currentLine = DEFAULT_LINE;
       continue;
     }
 
     if (char === ".") {
-      sum += getEnginePart() || 0;
+      sum += getEnginePartValue(currentLine);
+      currentLine = DEFAULT_LINE;
       continue;
     }
 
-    currentNum = {
-      ...currentNum,
-      line: lineIndex,
+    currentLine = {
+      ...currentLine,
+      index: lineIndex,
       downLine: lines[lineIndex + 1],
       upperLine: lines[lineIndex - 1],
-      currenrtLine: lines[lineIndex],
-      column: [...currentNum.column, {
+      raw: lines[lineIndex],
+      columns: [...currentLine.columns, {
         index: columnIndex,
         value: char,
       }],
     };
   }
 }
+
+type Lines = {
+  index: number;
+  columns: { index: number; value: string }[];
+  upperLine: string;
+  downLine: string;
+  raw: string;
+};
 
 console.log(sum);
