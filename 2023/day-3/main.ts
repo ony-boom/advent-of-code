@@ -45,7 +45,7 @@ const getEnginePartValue = (line: Lines) => {
   return value;
 };
 
-let sum = 0;
+let sumPart = 0;
 let currentLine = DEFAULT_LINE;
 
 for (const [lineIndex, line] of lines.entries()) {
@@ -53,13 +53,13 @@ for (const [lineIndex, line] of lines.entries()) {
 
   for (const [columnIndex, char] of splitedLine.entries()) {
     if (symbolRe.test(char)) {
-      sum += getEnginePartValue(currentLine);
+      sumPart += getEnginePartValue(currentLine);
       currentLine = DEFAULT_LINE;
       continue;
     }
 
     if (char === ".") {
-      sum += getEnginePartValue(currentLine);
+      sumPart += getEnginePartValue(currentLine);
       currentLine = DEFAULT_LINE;
       continue;
     }
@@ -86,4 +86,4 @@ type Lines = {
   raw: string;
 };
 
-console.log(sum);
+console.log(sumPart);

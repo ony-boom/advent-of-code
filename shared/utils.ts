@@ -8,11 +8,30 @@ export const getInput = async (year: number, day: number): Promise<string> => {
   return decoder.decode(inputFile);
 };
 
-export const getInputLines = async (
+export async function getInputLines(
   year: number,
   day: number,
-): Promise<string[]> => {
+): Promise<string[]>;
+export async function getInputLines(
+  year: number,
+  day: number,
+  splitByNewLine: true,
+): Promise<string[]>;
+export async function getInputLines(
+  year: number,
+  day: number,
+  splitByNewLine: false,
+): Promise<string>;
+export async function getInputLines(
+  year: number,
+  day: number,
+  splitByNewLine?: boolean,
+): Promise<string[] | string> {
   const input = await getInput(year, day);
 
-  return input.split("\n");
-};
+  if (splitByNewLine !== false) {
+    return input.split("\n");
+  }
+
+  return input;
+}
