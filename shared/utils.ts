@@ -1,4 +1,4 @@
-export const getInput = async (year: number, day: number): Promise<string> => {
+const getInput = async (year: number, day: number): Promise<string> => {
   const decoder = new TextDecoder("utf-8");
 
   const inputPath = `./${year}/day-${day}/input.txt`;

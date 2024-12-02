@@ -1,5 +1,8 @@
 {
   "tasks": {
     "run": "deno run --allow-read start.ts"
+  },
+  "imports": {
+    "@utils": "./shared/utils.ts"
   }
 }

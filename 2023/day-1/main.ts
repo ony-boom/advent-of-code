@@ -1,4 +1,4 @@
-import { getInputLines } from "../../shared/utils.ts";
+import { getInputLines } from "@utils";
 
 const wordToNumberMap: Map<string, string> = new Map([
   ["one", "1"],

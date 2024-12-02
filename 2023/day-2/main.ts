@@ -1,4 +1,4 @@
-import { getInputLines } from "../../shared/utils.ts";
+import { getInputLines } from "@utils";
 
 const lines = await getInputLines(2023, 2);
 
