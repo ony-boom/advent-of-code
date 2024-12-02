@@ -47,7 +47,27 @@ export const getSum = () => {
 };
 
 export const getSimilarity = () => {
+    const frequencyMap = new Map<number, number>();
+    const frequencyCache = new Map<number, number>();
 
+    for (const number of group2) {
+        frequencyMap.set(number, (frequencyMap.get(number) || 0) + 1);
+    }
+
+    let sum = 0;
+
+    for (const number of group1) {
+        if (frequencyCache.has(number)) {
+            sum += frequencyCache.get(number)!;
+            continue;
+        }
+        // compute similarity
+        const frequency = frequencyMap.get(number) || 0;
+        const similarity = frequency * number;
+        frequencyCache.set(number, similarity);
+        sum += similarity;
+    }
+    return sum;
 };
 
 console.log(getSimilarity());
