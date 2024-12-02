@@ -25,8 +25,6 @@ function pushSort(array: number[], value: number) {
 }
 
 for (const line of lines) {
-    if (line === "") continue;
-
     const [group1Id, group2Id] = line.split("   ").map(Number);
 
     pushSort(group1, group1Id);
