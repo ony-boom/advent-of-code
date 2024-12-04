@@ -67,5 +67,3 @@ export const getSimilarity = () => {
     }
     return sum;
 };
-
-console.log(getSimilarity());
