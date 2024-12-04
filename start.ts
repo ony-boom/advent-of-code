@@ -8,12 +8,12 @@ const flags = parse(Deno.args, {
 
 const year = new Date().getFullYear();
 
+if (!flags.years || !flags.day) {
+  console.log("No year or day provided, using current year and day 1");
+}
+
 flags.years ||= flags.y || year.toString();
 flags.day ||= flags.d || "1";
-
-if (!flags.years || !flags.day) {
-  throw new Error("Please provide both --years and --day");
-}
 
 const modulePath = `./${flags.years}/day-${flags.day}/main.ts`;
 
