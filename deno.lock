@@ -1,5 +1,5 @@
 {
-  "version": "3",
+  "version": "4",
   "redirects": {
     "https://deno.land/x/is_number/mod.ts": "https://deno.land/x/is_number@v1.6.1/mod.ts"
   },
@@ -30,6 +30,10 @@
     "https://deno.land/std@0.177.0/_util/asserts.ts": "178dfc49a464aee693a7e285567b3d0b555dc805ff490505a8aae34f9cfb1462",
     "https://deno.land/std@0.177.0/flags/mod.ts": "d1cdefa18472ef69858a17df5cf7c98445ed27ac10e1460183081303b0ebc270",
     "https://deno.land/std@0.208.0/fs/exists.ts": "cb59a853d84871d87acab0e7936a4dac11282957f8e195102c5a7acb42546bb8",
-    "https://deno.land/x/is_number@v1.6.1/mod.ts": "b4a0e0ee95c43acfb664c489041af20e27edb8fded3ef71b9ab54b8e21e888d4"
+    "https://deno.land/x/is_number@v1.6.1/mod.ts": "b4a0e0ee95c43acfb664c489041af20e27edb8fded3ef71b9ab54b8e21e888d4",
+    "https://deno.land/x/math@v1.1.0/matrix/eye.ts": "b7b060fc60a6f4ae4e3caa82e5a094cd622bd8519f67ad81e305b197a9d19d1c",
+    "https://deno.land/x/math@v1.1.0/matrix/identity.ts": "00246e8133f2fac4a1481af7390907cc4cf3e8415a00d29a1e0beb47bdd81074",
+    "https://deno.land/x/math@v1.1.0/matrix/matrix.ts": "2b80cd4fb8aa0ab9eca31cf6eb1037a2885f37ae7f84e1b7f050fa831089e937",
+    "https://deno.land/x/math@v1.1.0/matrix/mod.ts": "123212ccd86007864c3400ca3deaa998c7e9453b77538094d06edc1add50f199"
   }
 }
