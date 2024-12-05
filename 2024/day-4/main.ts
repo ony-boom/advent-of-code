@@ -35,7 +35,7 @@ const extractAllDiagonals = (): string[] => {
 export const getTotalXMasCount = () => {
   const getXMasCount = (input: string) => {
     // yes 😭, the `?=` is a positive lookahead assertion
-    // this saved my ass
+    // this saved my ass (reference from 2023 day 1 challenge)
     const matches = input.match(/(?=(xmas|samx))/gi);
     return matches?.length || 0;
   };
