@@ -77,5 +77,3 @@ export const getFixedUpdatesMiddlePageSum = () => {
     .map((update) => fixInvalidUpdate(pageOrders, update))
     .reduce((acc, update) => acc + getMiddlePage(update), 0);
 };
-
-console.log(getFixedUpdatesMiddlePageSum());
