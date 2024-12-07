@@ -169,5 +169,3 @@ const _moves = await guard.getTotalMoves({
   illustrate: false,
   redrawDelay: 500,
 });
-
-console.log(_moves);
