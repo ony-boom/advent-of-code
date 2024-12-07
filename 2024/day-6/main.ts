@@ -20,7 +20,6 @@ class Guard {
     this.map = map;
     this.guardSymbol = guardSymbol;
 
-    // add initial position to passed coordinates
     this.updateGruardPassedCoordinates();
   }
 
@@ -33,18 +32,12 @@ class Guard {
   };
 
   private get guardDirection(): GuardDirection {
-    switch (this.guardSymbol) {
-      case "^":
-        return "up";
-      case "v":
-        return "down";
-      case "<":
-        return "left";
-      case ">":
-        return "right";
-      default:
-        return "up";
-    }
+    return {
+      "^": "up",
+      v: "down",
+      "<": "left",
+      ">": "right",
+    }[this.guardSymbol] as GuardDirection;
   }
 
   private buildMap(
@@ -87,18 +80,10 @@ class Guard {
   };
 
   private nextGuardSymbol() {
-    switch (this.guardSymbol) {
-      case "^":
-        return ">";
-      case ">":
-        return "v";
-      case "v":
-        return "<";
-      case "<":
-        return "^";
-      default:
-        return "^";
-    }
+    const symbols = ["^", ">", "v", "<"];
+    return symbols[
+      (symbols.indexOf(this.guardSymbol) + 1) % symbols.length
+    ] as GuardSymbol;
   }
 
   private shouldTurnRight() {
@@ -167,13 +152,13 @@ class Guard {
 
     do {
       drawFn();
-      this.moveGuard(); // Move first
+      this.moveGuard();
       if (illustrate) {
         await sleep(redrawDelay);
       }
-    } while (!this.isDone()); // Check boundary after moving
+    } while (!this.isDone());
 
-    drawFn(); // Ensure the last state is drawn (if illustrate is true)
+    drawFn();
     return this.passedCoordinates.size;
   }
 }
@@ -181,6 +166,8 @@ class Guard {
 const guard = new Guard(await getInputLines(2024, 6));
 
 const _moves = await guard.getTotalMoves({
-  illustrate: true,
-  redrawDelay: 1000 / 30,
+  illustrate: false,
+  redrawDelay: 500,
 });
+
+console.log(_moves);
