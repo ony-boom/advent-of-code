@@ -144,7 +144,7 @@ class Guard {
   private isInitialGuardPosition = (position: Coordinates): boolean =>
     this.initialState.guardPosition.every((v, i) => position[i] === v);
 
-  async findPossibleObstructionPositions(): Promise<number> {
+  async findPossibleObstructionPositions() {
     let total = 0;
 
     for (let y = 0; y < this.map.length; y++) {
