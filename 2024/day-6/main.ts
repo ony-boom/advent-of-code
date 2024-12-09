@@ -26,7 +26,7 @@ class Guard {
   private readonly passedCoordinates = new Set<string>();
   private readonly passedCoordinatesWithDirection = new Map<string, number>();
 
-  private guardSymbol: GuardSymbol = "^";
+  private guardSymbol: GuardSymbol;
   private readonly obstacleSymbol = "#";
   private readonly markerSymbol = "X";
   private guardPosition: Coordinates = [0, 0];
@@ -77,19 +77,18 @@ class Guard {
     const guardPosition: Coordinates = [0, 0];
     let guardSymbol: GuardSymbol = "^";
 
-    inputs.forEach((line, rowIndex) => {
+    for (let i = 0; i < inputs.length; i++) {
+      const line = inputs[i];
       const splitLine: string[] = line.split("").map((char) => {
         if (Guard.DIRECTION_MAP[char as GuardSymbol]) {
           guardPosition[0] = line.indexOf(char);
-          guardPosition[1] = rowIndex;
+          guardPosition[1] = i;
           guardSymbol = char as GuardSymbol;
         }
         return char;
       });
-
       map.push(splitLine);
-    });
-
+    }
     return { guardPosition, map, guardSymbol };
   }
 
@@ -144,6 +143,7 @@ class Guard {
   private isInitialGuardPosition = (position: Coordinates): boolean =>
     this.initialState.guardPosition.every((v, i) => position[i] === v);
 
+  // possible improvement: use worker threads
   async findPossibleObstructionPositions() {
     let total = 0;
 
@@ -213,11 +213,12 @@ class Guard {
 }
 
 async function main() {
-  // const guard = new Guard(await getInputLines(2024, 6));
+  const guard = new Guard(await getInputLines(2024, 6));
   // // const moves = await guard.getTotalMoves({ illustrate: false });
-  // const start = performance.now();
-  // const possibleObstructions = await guard.findPossibleObstructionPositions();
-  // console.log({ possibleObstructions, duration: performance.now() - start });
+  const start = performance.now();
+  const possibleObstructions = await guard.findPossibleObstructionPositions();
+  const duration = (performance.now() - start) / 1000;
+  console.log({ possibleObstructions, duration: `${duration}s` });
 }
 
 main().catch(console.error);
