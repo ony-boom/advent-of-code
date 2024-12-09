@@ -5,101 +5,124 @@ type GuardSymbol = "^" | ">" | "<" | "v";
 type GuardDirection = "up" | "down" | "left" | "right";
 
 class Guard {
-  readonly passedCoordinates: Set<string> = new Set();
+  private static readonly GUARD_SYMBOLS: GuardSymbol[] = ["^", ">", "v", "<"];
+  private static readonly DIRECTION_MAP: Record<GuardSymbol, GuardDirection> = {
+    "^": "up",
+    ">": "right",
+    "v": "down",
+    "<": "left",
+  };
+
+  private static readonly MOVEMENT_OFFSETS: Record<
+    GuardDirection,
+    Coordinates
+  > = {
+    up: [0, -1],
+    down: [0, 1],
+    left: [-1, 0],
+    right: [1, 0],
+  };
+
+  private readonly passedCoordinates = new Set<string>();
+  private readonly passedCoordinatesWithDirection = new Map<string, number>();
+
   private guardSymbol: GuardSymbol = "^";
-  private obstacleSymbol = "#";
-  readonly markerSymbol = "X";
+  private readonly obstacleSymbol = "#";
+  private readonly markerSymbol = "X";
   private guardPosition: Coordinates = [0, 0];
 
-  readonly map: string[][] = [];
+  private map: string[][];
+  private readonly initialState: {
+    guardPosition: Coordinates;
+    map: string[][];
+    guardSymbol: GuardSymbol;
+  };
 
   constructor(inputs: string[]) {
-    const { guardPosition, map, guardSymbol } = this.buildMap(inputs);
+    const mapState = this.buildMap(inputs);
+    this.initialState = structuredClone(mapState);
 
+    const { guardPosition, map, guardSymbol } = mapState;
     this.guardPosition = guardPosition;
     this.map = map;
     this.guardSymbol = guardSymbol;
 
-    this.updateGruardPassedCoordinates();
+    this.updateGuardPassedCoordinates();
   }
 
-  private updateGruardPassedCoordinates() {
-    this.passedCoordinates.add(this.guardPosition.join(","));
+  private reset() {
+    this.map = structuredClone(this.initialState.map);
+    this.guardPosition = [...this.initialState.guardPosition];
+    this.guardSymbol = this.initialState.guardSymbol;
+    this.passedCoordinatesWithDirection.clear();
   }
 
-  private getGuardSymbol = (symbol: string): symbol is GuardSymbol => {
-    return ["^", ">", "<", "v"].includes(symbol);
-  };
+  private updateGuardPassedCoordinates() {
+    const positionKey = this.guardPosition.join(",");
+    this.passedCoordinates.add(positionKey);
+
+    const directionKey = `${positionKey}-${this.guardDirection}`;
+    this.passedCoordinatesWithDirection.set(
+      directionKey,
+      (this.passedCoordinatesWithDirection.get(directionKey) ?? 0) + 1,
+    );
+  }
 
   private get guardDirection(): GuardDirection {
-    return {
-      "^": "up",
-      v: "down",
-      "<": "left",
-      ">": "right",
-    }[this.guardSymbol] as GuardDirection;
+    return Guard.DIRECTION_MAP[this.guardSymbol];
   }
 
-  private buildMap(
-    inputs: string[],
-  ): {
-    guardPosition: Coordinates;
-    map: string[][];
-    guardSymbol: GuardSymbol;
-  } {
+  private buildMap(inputs: string[]) {
     const map: string[][] = [];
     const guardPosition: Coordinates = [0, 0];
     let guardSymbol: GuardSymbol = "^";
-    for (const [rowIndex, line] of inputs.entries()) {
-      const splitLine = [];
-      for (let columnIndex = 0; columnIndex < line.length; columnIndex++) {
-        const char = line[columnIndex];
-        if (this.getGuardSymbol(char)) {
-          guardPosition[0] = columnIndex;
-          guardPosition[1] = rowIndex;
-          guardSymbol = char;
-        }
-        splitLine.push(char);
-      }
-      map.push(splitLine);
-    }
 
-    return {
-      guardPosition,
-      map,
-      guardSymbol,
-    };
+    inputs.forEach((line, rowIndex) => {
+      const splitLine: string[] = line.split("").map((char) => {
+        if (Guard.DIRECTION_MAP[char as GuardSymbol]) {
+          guardPosition[0] = line.indexOf(char);
+          guardPosition[1] = rowIndex;
+          guardSymbol = char as GuardSymbol;
+        }
+        return char;
+      });
+
+      map.push(splitLine);
+    });
+
+    return { guardPosition, map, guardSymbol };
   }
 
-  private isDone = () => {
+  private isMapEdge() {
     const [x, y] = this.guardPosition;
     const mapHeight = this.map.length;
     const mapWidth = this.map[0]?.length ?? 0;
 
     return x === 0 || y === 0 || x === mapWidth - 1 || y === mapHeight - 1;
-  };
+  }
 
   private nextGuardSymbol() {
-    const symbols = ["^", ">", "v", "<"];
-    return symbols[
-      (symbols.indexOf(this.guardSymbol) + 1) % symbols.length
-    ] as GuardSymbol;
+    const currentIndex = Guard.GUARD_SYMBOLS.indexOf(this.guardSymbol);
+    return Guard.GUARD_SYMBOLS[(currentIndex + 1) % Guard.GUARD_SYMBOLS.length];
   }
 
   private shouldTurnRight() {
     const [x, y] = this.guardPosition;
-    const offsets: Record<string, [number, number]> = {
-      up: [0, -1],
-      down: [0, 1],
-      left: [-1, 0],
-      right: [1, 0],
-    };
+    const [dx, dy] = Guard.MOVEMENT_OFFSETS[this.guardDirection];
 
-    const offset = offsets[this.guardDirection];
-    if (!offset) return false;
+    const nextCell = this.map[y + dy]?.[x + dx];
+    return nextCell === this.obstacleSymbol || nextCell === "O";
+  }
 
-    const [dx, dy] = offset;
-    return this.map[y + dy]?.[x + dx] === this.obstacleSymbol;
+  private isInLoop() {
+    if (this.isInitialGuardPosition(this.guardPosition)) {
+      return false;
+    }
+
+    const key = `${this.guardPosition.join(",")}-${this.guardDirection}`;
+    const visitCount = this.passedCoordinatesWithDirection.get(key) || 0;
+
+    return visitCount > 1;
   }
 
   private moveGuard() {
@@ -108,45 +131,71 @@ class Guard {
       return;
     }
 
-    const currentGuardDirection = this.guardDirection;
     const [x, y] = this.guardPosition;
-    const newPosition = [...this.guardPosition] as Coordinates;
-
-    switch (currentGuardDirection) {
-      case "up":
-        newPosition[1] = y - 1;
-        break;
-      case "down":
-        newPosition[1] = y + 1;
-        break;
-      case "left":
-        newPosition[0] = x - 1;
-        break;
-      case "right":
-        newPosition[0] = x + 1;
-        break;
-    }
+    const [dx, dy] = Guard.MOVEMENT_OFFSETS[this.guardDirection];
 
     this.map[y][x] = this.markerSymbol;
-    this.map[newPosition[1]][newPosition[0]] = this.guardSymbol;
+    this.guardPosition = [x + dx, y + dy];
+    this.map[this.guardPosition[1]][this.guardPosition[0]] = this.guardSymbol;
 
-    this.guardPosition = newPosition;
-    this.updateGruardPassedCoordinates();
+    this.updateGuardPassedCoordinates();
   }
 
-  async getTotalMoves(
-    { illustrate, redrawDelay = 1000 }: {
-      redrawDelay?: number;
-      illustrate?: boolean;
-    },
-  ) {
+  private isInitialGuardPosition = (position: Coordinates): boolean =>
+    this.initialState.guardPosition.every((v, i) => position[i] === v);
+
+  async findPossibleObstructionPositions(): Promise<number> {
+    let total = 0;
+
+    for (let y = 0; y < this.map.length; y++) {
+      for (let x = 0; x < this.map[y].length; x++) {
+        const cell = this.map[y][x];
+
+        if (
+          cell === this.obstacleSymbol || this.isInitialGuardPosition([x, y])
+        ) {
+          continue;
+        }
+
+        this.map[y][x] = "O";
+        if (await this.simulate()) {
+          total++;
+        }
+        this.map[y][x] = ".";
+        this.reset();
+      }
+    }
+
+    return total;
+  }
+
+  // deno-lint-ignore require-await
+  private async simulate() {
+    do {
+      if (this.isInLoop()) {
+        return true;
+      }
+      this.moveGuard();
+    } while (!this.isMapEdge());
+
+    return false;
+  }
+
+  private illustrate() {
+    console.clear();
+    for (let index = 0; index < this.map.length; index++) {
+      const row = this.map[index];
+      console.log(row.join(""));
+    }
+  }
+
+  async getTotalMoves({ illustrate, redrawDelay = 1000 }: {
+    redrawDelay?: number;
+    illustrate?: boolean;
+  }): Promise<number> {
     const drawFn = () => {
       if (illustrate) {
-        console.clear();
-        const map = this.map;
-        for (const row of map) {
-          console.log(row.join(""));
-        }
+        this.illustrate();
       }
     };
 
@@ -156,16 +205,19 @@ class Guard {
       if (illustrate) {
         await sleep(redrawDelay);
       }
-    } while (!this.isDone());
+    } while (!this.isMapEdge());
 
     drawFn();
     return this.passedCoordinates.size;
   }
 }
 
-const guard = new Guard(await getInputLines(2024, 6));
+async function main() {
+  // const guard = new Guard(await getInputLines(2024, 6));
+  // // const moves = await guard.getTotalMoves({ illustrate: false });
+  // const start = performance.now();
+  // const possibleObstructions = await guard.findPossibleObstructionPositions();
+  // console.log({ possibleObstructions, duration: performance.now() - start });
+}
 
-const _moves = await guard.getTotalMoves({
-  illustrate: false,
-  redrawDelay: 500,
-});
+main().catch(console.error);
