@@ -189,7 +189,7 @@ class Guard {
     }
   }
 
-  async getTotalMoves({ illustrate, redrawDelay = 1000 }: {
+  async getTotalMoves({ illustrate, redrawDelay = 1000 / 8 }: {
     redrawDelay?: number;
     illustrate?: boolean;
   }): Promise<number> {
@@ -214,11 +214,11 @@ class Guard {
 
 async function main() {
   const guard = new Guard(await getInputLines(2024, 6));
-  // // const moves = await guard.getTotalMoves({ illustrate: false });
-  const start = performance.now();
-  const possibleObstructions = await guard.findPossibleObstructionPositions();
-  const duration = (performance.now() - start) / 1000;
-  console.log({ possibleObstructions, duration: `${duration}s` });
+  const moves = await guard.getTotalMoves({ illustrate: true });
+  // const start = performance.now();
+  // const possibleObstructions = await guard.findPossibleObstructionPositions();
+  // const duration = (performance.now() - start) / 1000;
+  // console.log({ possibleObstructions, duration: `${duration}s` });
 }
 
 main().catch(console.error);
