@@ -94,7 +94,7 @@ class Calibrations {
   }
 }
 
-const lines = await getInputLines(2024, 7);
-const calibrations = new Calibrations(lines);
+// const lines = await getInputLines(2024, 7);
+// const calibrations = new Calibrations(lines);
 
-console.log(calibrations.getCalibrationResult(["*", "+", "||"]));
+// part 1: console.log(calibrations.getCalibrationResult(["*", "+", "||"]));
